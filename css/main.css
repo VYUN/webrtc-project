@@ -6,4 +6,16 @@ video {
   max-width: 100%;
   width: 320px;
 }
+#videos {
+  position:relative;
+}
 
+#localVideo {
+  position:absolute;
+  z-index:1;
+}
+
+#overlay {
+    position: relative;
+    z-index:20;
+}
