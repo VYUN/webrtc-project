@@ -3,7 +3,6 @@
 var videoInput = document.getElementById('vid');
 var canvasInput = document.getElementById('compare');
 
-console.log("gg");
 document.addEventListener("headtrackrStatus", function(event) {
   if (event.status == "found") {
     console.log("found face");
