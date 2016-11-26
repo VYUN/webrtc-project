@@ -5,8 +5,27 @@ var isInitiator = false;
 var isStarted = false;
 var localStream;
 var pc;
+var dataChannel;
 var remoteStream;
 var turnReady;
+var room;
+var localVideo = document.querySelector('#localVideo');
+var remoteVideo = document.querySelector('#remoteVideo');
+
+var photo = document.getElementById('photo');
+var photoContext = photo.getContext('2d');
+var trail = document.getElementById('trail');
+var snapButton = document.getElementById('snap');
+var sendButton = document.getElementById('send');
+var snapAndSendButton = document.getElementById('snapAndSend');
+
+var photoContextW;
+var photoContextH;
+
+// Attach event handlers
+snapButton.addEventListener('click', snapPhoto);
+sendButton.addEventListener('click', sendPhoto);
+snapAndSendButton.addEventListener('click', snapAndSend);
 
 var pcConfig = {
   'iceServers': [{
@@ -24,7 +43,6 @@ var sdpConstraints = {
 
 /////////////////////////////////////////////
 
-var room = 'foo';
 // Could prompt for room name:
 room = prompt('Enter room name:');
 
@@ -92,8 +110,6 @@ socket.on('message', function(message) {
 
 ////////////////////////////////////////////////////
 
-var localVideo = document.querySelector('#localVideo');
-var remoteVideo = document.querySelector('#remoteVideo');
 
 navigator.mediaDevices.getUserMedia({
   audio: true,
@@ -104,12 +120,18 @@ navigator.mediaDevices.getUserMedia({
   alert('getUserMedia() error: ' + e.name);
 });
 
-
 function gotStream(stream) {
   console.log('Adding local stream.');
   localVideo.src = window.URL.createObjectURL(stream);
   localStream = stream;
   sendMessage('got user media');
+
+  localVideo.onloadedmetadata = function() {
+    photo.width = photoContextW = 320;
+    photo.height = photoContextH = 240;
+    console.log('gotStream width with and height:', photoContextW, photoContextH);
+  };
+  show(snapButton);
   if (isInitiator) {
     maybeStart();
   }
@@ -132,6 +154,7 @@ function maybeStart() {
   if (!isStarted && typeof localStream !== 'undefined' && isChannelReady) {
     console.log('>>>>>> creating peer connection');
     createPeerConnection();
+    
     pc.addStream(localStream);
     isStarted = true;
     console.log('isInitiator', isInitiator);
@@ -159,6 +182,23 @@ function createPeerConnection() {
     alert('Cannot create RTCPeerConnection object.');
     return;
   }
+
+
+  if (isInitiator) {
+    console.log('Creating Data Channel');
+    dataChannel = pc.createDataChannel('photos');
+    onDataChannelCreated(dataChannel);
+
+    console.log('Creating an offer');
+
+  } else {
+      pc.ondatachannel = function(event) {
+        console.log('ondatachannel:', event.channel);
+        dataChannel = event.channel;
+        onDataChannelCreated(dataChannel);
+      };
+  }
+    
 }
 
 function handleIceCandidate(event) {
@@ -271,6 +311,16 @@ function stop() {
 
 ///////////////////////////////////////////
 
+function onDataChannelCreated(channel) {
+  console.log('onDataChannelCreated:', channel);
+
+  channel.onopen = function() {
+    console.log('CHANNEL opened!!!');
+  };
+
+  channel.onmessage = receiveDataChromeFactory();
+  
+}
 // Set Opus as the default audio codec if it's present.
 function preferOpus(sdp) {
   var sdpLines = sdp.split('\r\n');
@@ -347,4 +397,85 @@ function removeCN(sdpLines, mLineIndex) {
   return sdpLines;
 }
 
+function receiveDataChromeFactory() {
+  var buf, count;
+  console.log('Receiving...');
+  return function onmessage(event) {
+    if (typeof event.data === 'string') {
+      buf = window.buf = new Uint8ClampedArray(parseInt(event.data));
+      count = 0;
+      console.log('Expecting a total of ' + buf.byteLength + ' bytes');
+      return;
+    }
+
+    var data = new Uint8ClampedArray(event.data);
+    buf.set(data, count);
+
+    count += data.byteLength;
+    console.log('count: ' + count);
+
+    if (count === buf.byteLength) {
+    // we're done: all data chunks have been received
+      renderPhoto(buf);
+      console.log('Done. Rendering photo.');
+    }
+  };
+}
+
+function snapPhoto() {
+  photoContext.drawImage(localVideo, 0, 0, photo.width, photo.height);
+  show(photo, sendButton);
+}
+
+function sendPhoto() {
+// Split data channel message in chunks of this byte length.
+  var CHUNK_LEN = 64000;
+  console.log('width and height ', photoContextW, photoContextH);
+  var img = photoContext.getImageData(0, 0, photoContextW, photoContextH),
+  len = img.data.byteLength,
+  n = len / CHUNK_LEN | 0;
+
+  console.log('Sending a total of ' + len + ' byte(s)');
+  dataChannel.send(len);
+
+  // split the photo and send in chunks of about 64KB
+  for (var i = 0; i < n; i++) {
+    var start = i * CHUNK_LEN,
+    end = (i + 1) * CHUNK_LEN;
+    console.log(start + ' - ' + (end - 1));
+    dataChannel.send(img.data.subarray(start, end));
+  }
+
+  // send the reminder, if any
+  if (len % CHUNK_LEN) {
+    console.log('last ' + len % CHUNK_LEN + ' byte(s)');
+    dataChannel.send(img.data.subarray(n * CHUNK_LEN));
+  }
+}
+
+function snapAndSend() {
+  snapPhoto();
+  sendPhoto();
+}
+
+function renderPhoto(data) {
+  console.log('Rendering...');
+  var canvas = document.createElement('canvas');
+  canvas.width = photoContextW;
+  canvas.height = photoContextH;
+  canvas.classList.add('incomingPhoto');
+  // trail is the element holding the incoming images
+  trail.insertBefore(canvas, trail.firstChild);
+
+  var context = canvas.getContext('2d');
+  var img = context.createImageData(photoContextW, photoContextH);
+  img.data.set(data);
+  context.putImageData(img, 0, 0);
+}
+
+function show() {
+  Array.prototype.forEach.call(arguments, function(elem) {
+    elem.style.display = null;
+  });
+}
 
