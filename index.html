@@ -15,6 +15,10 @@
 
   <div id="videos">
     <video id="localVideo" autoplay muted></video>
+    <!-- Local headtrackr, hide both -->
+    <canvas id="compare" width="320" height="240" style="display:none"></canvas>
+		<video id="vid" autoplay loop width="320" height="240"></video>
+
     <video id="remoteVideo" autoplay></video>
     <canvas id="photo"></canvas>
   </div>
@@ -34,6 +38,7 @@
   <script src="js/lib/adapter.js"></script>
   <script src="js/lib/headtrackr.min.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/projTracker.js"></script>
 
 </body>
 
