@@ -75,16 +75,12 @@ function drawGridLoop() {
     }
 }
 
-var animPause = false;
 function drawMaskLoop() {
   positions = ctracker.getCurrentPosition();
   overlayContext.clearRect(0, 0, 320, 240);
   if (positions) {
       // draw mask on top of face
       fd.draw(positions);
-  }
-  if (animPause) {
-      return;
   }
   animationRequest = requestAnimationFrame(drawMaskLoop);
 }
@@ -95,11 +91,9 @@ check.addEventListener("click",function(e){
     if ( check.checked == true ) {
       console.log("true");
       drawGridLoop();
-      animPause = false;
       webGLCanvas.style.display="";
     } else {
       console.log("false");
-      animPause = true;
       fd.clear();
       webGLCanvas.style.display="none";
     }
