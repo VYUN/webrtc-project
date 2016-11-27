@@ -25,7 +25,13 @@
     <video id="remoteVideo" autoplay></video>
     <canvas id="photo"></canvas>
   </div>
-
+  <select name="mask" id="selectmask">
+        <option value="0">Audrey</option>
+        <option value="1">Mona Lisa</option>
+        <option value="2">Ironman</option>
+        <option value="3">Skull mask</option>
+        <option value="4">Sean Connery</option>
+  </select>
   <div id="buttons">
     <button id="snap">Snap</button><span> then </span><button id="send">Send</button>
     <span> or </span>
@@ -38,7 +44,11 @@
     <h2>Incoming photos</h2>
     <div id="trail"></div>
   </div>
-  <img id="ironman" class="masks" src="/images/ironman.jpg" style="display:none"></img>
+  <img id="audrey" class="masks" src="images/audrey.jpg" style="display:none"></img>
+  <img id="monalisa" class="masks" src="images/joconde.jpg" style="display:none"></img>
+  <img id="ironman" class="masks" src="images/ironman.jpg" style="display:none"></img>
+  <img id="sean" class="masks" src="images/SeanConnery.jpg" style="display:none"></img>
+  <img id="skull" class="masks" src="images/skullmask.jpg" style="display:none"></img>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="js/lib/adapter.js"></script>
