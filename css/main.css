@@ -15,7 +15,7 @@ video {
   z-index:1;
 }
 
-#overlay {
+#webgl {
     position: relative;
     z-index:20;
 }
