@@ -77,6 +77,7 @@ function drawGridLoop() {
 
 function drawMaskLoop() {
   positions = ctracker.getCurrentPosition();
+    //Here might have problem
   overlayContext.clearRect(0, 0, 320, 240);
   if (positions) {
       // draw mask on top of face

@@ -5,27 +5,47 @@
 
   <title>ENSC424</title>
 
-  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <link rel="stylesheet" href="css/bootstrap-datetimepicker.css">
 
 </head>
 
 <body>
 
-  <h1>HELLO</h1>
-
-  <div id="videos">
-    <video id="localVideo" autoplay muted></video>
+  <div class="Central">
+  <h1>Welcome To WebRTC ENSC424 Final Project</h1>
+  </div></br><br></br>
+  <div class="window">
+    <div id="videos">
+    <div class="Central">
+      <video id="localVideo" autoplay muted></video>
+      <video id="remoteVideo" autoplay></video>
     <canvas id="webgl" width="320" height="240"></canvas>
     <canvas id="overlay" width="320" height="240" style="display:none"></canvas>
+    </div>
+  </div>
+    </div>
 
     <!-- Local headtrackr, hide both -->
     <canvas id="compare" width="320" height="240" style="display:none"></canvas>
     <video id="vid" autoplay loop width="320" height="240" style="display:none"></video>
-
-    <video id="remoteVideo" autoplay></video>
+</br></br></br></br>
+  <div class="window">
     <canvas id="photo"></canvas>
   </div>
-  <select name="mask" id="selectmask">
+  </br>
+  </br>
+  </br>
+  <div class="Central">
+  <div id="incoming">
+    <h2>Incoming photos</h2>
+    <div id="trail"></div>
+  </div>
+  </div>
+  <div class="Central">
+   <span>Mask Selection</span></br>
+  <select name="mask" id="selectmask" class="selectpicker" multiple>
         <option value="0">Audrey</option>
         <option value="1">Mona Lisa</option>
         <option value="2">Ironman</option>
@@ -33,18 +53,28 @@
         <option value="4">Sean Connery</option>
         <option value="5">Cage</option>
   </select>
+    <div id="otherButton">
+      <input id="startFilter" type="checkbox">Filter</input>
+    </div>
+    <span>Color Filter</span>
+    <select id="filter">
+      <option value="none">None</option>
+      <option value="brightness">brightness</option>
+      <option value="grayscale">Grayscale</option>
+      <option value="invert">Invert</option>
+      <option value="sepia">Sepia</option>
+    </select>
+  </div>
+  <div class="Central">
   <div id="buttons">
-    <button id="snap">Snap</button><span> then </span><button id="send">Send</button>
+    <button id="snap" class="btn btn-primary btn-lg active">Snap</button><span> then </span><button id="send" class="btn btn-primary btn-lg active">Send</button>
     <span> or </span>
-    <button id="snapAndSend">Snap &amp; Send</button>
+    <button id="snapAndSend" class="btn btn-primary btn-lg active">Snap &amp; Send</button>
   </div>
-  <div id="otherButton">
-    <input id="startFilter" type="checkbox">Filter</input>
+
+
   </div>
-  <div id="incoming">
-    <h2>Incoming photos</h2>
-    <div id="trail"></div>
-  </div>
+
   <img id="audrey" class="masks" src="images/audrey.jpg" style="display:none"></img>
   <img id="monalisa" class="masks" src="images/joconde.jpg" style="display:none"></img>
   <img id="ironman" class="masks" src="images/ironman.jpg" style="display:none"></img>
@@ -62,6 +92,8 @@
 
   <script src="js/main.js"></script>
   <script src="js/projTracker.js"></script>
+  <script src="js/Filter.js"></script>
+
 
 
 </body>
